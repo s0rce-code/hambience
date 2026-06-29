@@ -21,20 +21,13 @@ blueprint:
       default: [200, 30, 30]
       selector:
         color_rgb: {}
-    crit_media_player:
-      name: Sound Player (optional)
-      description: A media player to play a sound on. Leave empty for no sound.
-      default: ""
-      selector:
-        entity:
-          filter:
-            - domain: media_player
     crit_sound:
       name: Sound (optional)
-      description: A Sound to play. Leave empty for no sound.
+      description: Pick a sound file to play on a critical roll. Leave empty for no sound.
       default: ""
       selector:
         media: {}
+
 mode: restart
 
 trigger:
@@ -44,8 +37,9 @@ trigger:
 condition: []
 
 variables:
-  media_player_entity: !input crit_media_player
-  sound_id: !input crit_sound
+  sound_entity_id: "{{ crit_sound.entity_id if crit_sound is mapping else '' }}"
+  sound_content_id: "{{ crit_sound.media_content_id if crit_sound is mapping else '' }}"
+  sound_content_type: "{{ crit_sound.media_content_type if crit_sound is mapping else 'music' }}"
 
 action:
   # Slow, self-restoring flash so lights return to their prior state on their own.
@@ -54,16 +48,16 @@ action:
     data:
       rgb_color: !input crit_color
       flash: long
-  # Optional sound, only if both a player and a sound were provided.
+  # Optional sound, only if the media selector was filled in.
   - choose:
       - conditions:
           - condition: template
-            value_template: "{{ media_player_entity not in [none, ''] and sound_id not in [none, ''] }}"
+            value_template: "{{ sound_entity_id != '' and sound_content_id != '' }}"
         sequence:
           - service: media_player.play_media
             target:
-              entity_id: "{{ media_player_entity }}"
+              entity_id: "{{ sound_entity_id }}"
             data:
-              media_content_id: "{{ sound_id }}"
-              media_content_type: music
+              media_content_id: "{{ sound_content_id }}"
+              media_content_type: "{{ sound_content_type }}"
     default: []
