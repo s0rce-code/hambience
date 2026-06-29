@@ -23,12 +23,28 @@ jobs:
       - name: Package module.zip
         run: zip -r module.zip . -x "*.git*" -x ".gitea/*" -x "*.DS_Store"
 
-      - name: Create release
-        uses: actions/create-release@v1
+      - name: Create release and upload assets
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ steps.version.outputs.VERSION }}
-          release_name: HAmbience ${{ steps.version.outputs.VERSION }}
-          draft: false
-          prerelease: false
+          GITEA_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.version.outputs.VERSION }}
+        run: |
+          MANIFEST_URL="https://git.msmanor.xyz/rufio/HAmbience/releases/download/${VERSION}/module.json"
+
+          RELEASE=$(curl -s -X POST \
+            -H "Authorization: token ${GITEA_TOKEN}" \
+            -H "Content-Type: application/json" \
+            -d "{\"tag_name\":\"${VERSION}\",\"name\":\"HAmbience ${VERSION}\",\"body\":\"## Foundry VTT Manifest URL\n\nPaste into Foundry: Add-on Modules > Install Module > Manifest URL:\n\n\`${MANIFEST_URL}\`\n\n---\n\nIf HAmbience adds something to your table, a coffee helps me keep building: https://buymeacoffee.com/s0rcecode\",\"draft\":false,\"prerelease\":false}" \
+            http://192.168.50.33:3000/api/v1/repos/rufio/HAmbience/releases)
+
+          RELEASE_ID=$(echo $RELEASE | grep -o '"id":[0-9]*' | head -1 | grep -o '[0-9]*')
+          echo "Release ID: ${RELEASE_ID}"
+
+          curl -s -X POST \
+            -H "Authorization: token ${GITEA_TOKEN}" \
+            -F "attachment=@module.json" \
+            "http://192.168.50.33:3000/api/v1/repos/rufio/HAmbience/releases/${RELEASE_ID}/assets"
+
+          curl -s -X POST \
+            -H "Authorization: token ${GITEA_TOKEN}" \
+            -F "attachment=@module.zip" \
+            "http://192.168.50.33:3000/api/v1/repos/rufio/HAmbience/releases/${RELEASE_ID}/assets"
