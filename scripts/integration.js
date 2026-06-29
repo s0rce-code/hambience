@@ -18,28 +18,40 @@ function api() { return game.modules.get(MODULE_ID)?.api; }
 /* ====================================================================== */
 
 export function initIntegrationControls() {
+  // getSceneControlButtons fires during canvas init, before ready in some cases.
+  // renderSceneControls fires after the controls are fully rendered and is safer.
   Hooks.on("getSceneControlButtons", onGetSceneControls);
   // Re-render the controls when the pause state changes so the icon updates.
   Hooks.on("hambience.pauseChanged", () => ui.controls?.render(true));
 }
 
 function onGetSceneControls(controls) {
-  if (!game.user?.isGM) return;
-  const paused = !!game.settings.get(MODULE_ID, SETTINGS.PAUSED);
+  try {
+    if (!game.user?.isGM) return;
+    if (!controls?.tokens?.tools) {
+      console.warn("HAmbience | getSceneControlButtons: controls.tokens.tools not found", controls);
+      return;
+    }
 
-  // v14: controls is a record, controls.tokens.tools is a record.
-  // Pattern from official v14 docs: controls.tokens.tools.myTool = { ... }
-  if (!controls?.tokens?.tools) return;
+    let paused = false;
+    try { paused = !!game.settings.get(MODULE_ID, SETTINGS.PAUSED); } catch (_e) { /* settings not ready yet */ }
 
-  controls.tokens.tools["hambience-toggle"] = {
-    name: "hambience-toggle",
-    title: paused ? "HAmbience: Paused (click to resume)" : "HAmbience: Active (click to pause)",
-    icon: "fa-solid fa-tower-broadcast",
-    order: Object.keys(controls.tokens.tools).length,
-    button: true,
-    visible: true,
-    onChange: () => api()?.setPaused(!game.settings.get(MODULE_ID, SETTINGS.PAUSED))
-  };
+    controls.tokens.tools["hambience-toggle"] = {
+      name: "hambience-toggle",
+      title: paused ? "HAmbience: Paused (click to resume)" : "HAmbience: Active (click to pause)",
+      icon: "fa-solid fa-tower-broadcast",
+      order: Object.keys(controls.tokens.tools).length,
+      button: true,
+      visible: true,
+      onChange: () => {
+        const current = game.settings.get(MODULE_ID, SETTINGS.PAUSED);
+        api()?.setPaused(!current);
+      }
+    };
+    console.log("HAmbience | GM toggle registered in scene controls.");
+  } catch (err) {
+    console.error("HAmbience | Error in getSceneControlButtons:", err);
+  }
 }
 
 /* ====================================================================== */
