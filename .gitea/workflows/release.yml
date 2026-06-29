@@ -20,27 +20,26 @@ jobs:
           VERSION=${{ steps.version.outputs.VERSION }}
           VERSION_NUM=${VERSION#v}
           sed -i "s|\"version\": \"[^\"]*\"|\"version\": \"${VERSION_NUM}\"|g" module.json
-          sed -i "s|\"download\": \"[^\"]*\"|\"download\": \"${{ secrets.REPOURL }}/releases/download/${VERSION}/module.zip\"|g" module.json
-          sed -i "s|\"manifest\": \"[^\"]*\"|\"manifest\": \"${{ secrets.REPOURL }}/releases/latest/module.json\"|g" module.json
+          sed -i "s|\"download\": \"[^\"]*\"|\"download\": \"${{ vars.REPO_URL }}/releases/download/${VERSION}/module.zip\"|g" module.json
+          sed -i "s|\"manifest\": \"[^\"]*\"|\"manifest\": \"${{ vars.REPO_URL }}/releases/latest/module.json\"|g" module.json
 
       - name: Package module.zip
-        run: zip -r module.zip . -x "*.git*" -x ".github/*" -x ".gitea/*" -x "*.DS_Store"
+        run: zip -r module.zip . -x "*.git*" -x ".gitea/*" -x "*.DS_Store"
 
       - name: Create release and upload assets
         env:
-          GITEA_TOKEN: ${{ secrets.GITEA_TOKEN }}
+          GITEA_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERSION: ${{ steps.version.outputs.VERSION }}
-          INTERALURL: ${{ secrets.INTERALURL }}
-          REPO_URL: ${{ secrets.REPOURL }}
+          INTERNAL: ${{ vars.INTERNAL_URL }}
+          REPO: ${{ vars.REPO_URL }}
         run: |
-          INTERNAL_URL="http://${INTERALURL}"
-          MANIFEST_URL="${REPO_URL}/releases/download/${VERSION}/module.json"
+          MANIFEST_URL="${REPO}/releases/download/${VERSION}/module.json"
 
           RELEASE=$(curl -s -X POST \
             -H "Authorization: token ${GITEA_TOKEN}" \
             -H "Content-Type: application/json" \
             -d "{\"tag_name\":\"${VERSION}\",\"name\":\"HAmbience ${VERSION}\",\"body\":\"## Foundry VTT Manifest URL\n\nPaste into Foundry: Add-on Modules > Install Module > Manifest URL:\n\n\`${MANIFEST_URL}\`\n\n---\n\nIf HAmbience adds something to your table, a coffee helps me keep building: https://buymeacoffee.com/s0rcecode\",\"draft\":false,\"prerelease\":false}" \
-            "${INTERNAL_URL}/api/v1/repos/rufio/HAmbience/releases")
+            "${INTERNAL}/api/v1/repos/rufio/HAmbience/releases")
 
           RELEASE_ID=$(echo $RELEASE | grep -o '"id":[0-9]*' | head -1 | grep -o '[0-9]*')
           echo "Release ID: ${RELEASE_ID}"
@@ -48,9 +47,9 @@ jobs:
           curl -s -X POST \
             -H "Authorization: token ${GITEA_TOKEN}" \
             -F "attachment=@module.json" \
-            "${INTERNAL_URL}/api/v1/repos/rufio/HAmbience/releases/${RELEASE_ID}/assets"
+            "${INTERNAL}/api/v1/repos/rufio/HAmbience/releases/${RELEASE_ID}/assets"
 
           curl -s -X POST \
             -H "Authorization: token ${GITEA_TOKEN}" \
             -F "attachment=@module.zip" \
-            "${INTERNAL_URL}/api/v1/repos/rufio/HAmbience/releases/${RELEASE_ID}/assets"
+            "${INTERNAL}/api/v1/repos/rufio/HAmbience/releases/${RELEASE_ID}/assets"
