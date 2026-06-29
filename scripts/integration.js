@@ -39,10 +39,12 @@ function onGetSceneControls(controls) {
     controls.tokens.tools["hambience-toggle"] = {
       name: "hambience-toggle",
       title: paused ? "HAmbience: Paused (click to resume)" : "HAmbience: Active (click to pause)",
-      icon: "fa-solid fa-tower-broadcast",
+      icon: paused ? "fa-solid fa-tower-broadcast hambience-paused" : "fa-solid fa-tower-broadcast",
       order: Object.keys(controls.tokens.tools).length,
       button: true,
       visible: true,
+      active: !paused,
+      toggle: true,
       onChange: () => {
         const current = game.settings.get(MODULE_ID, SETTINGS.PAUSED);
         api()?.setPaused(!current);

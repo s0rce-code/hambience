@@ -150,3 +150,12 @@
 
 /* Preset companion blueprint block in the trigger editor */
 .hambience-preset-blueprint { margin-top: 0.4rem; padding-top: 0.4rem; border-top: 1px dashed var(--color-border-light-tertiary, rgba(0,0,0,0.15)); }
+
+/* GM Toggle active/paused state */
+.scene-control[data-control="tokens"] .control-tool[data-tool="hambience-toggle"] i {
+  color: var(--color-text-hyperlink, #5e0000);
+}
+.scene-control[data-control="tokens"] .control-tool[data-tool="hambience-toggle"] i.hambience-paused {
+  color: var(--color-text-dark-secondary, #999);
+  opacity: 0.5;
+}
