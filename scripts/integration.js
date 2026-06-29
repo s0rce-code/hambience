@@ -43,8 +43,6 @@ function onGetSceneControls(controls) {
       order: Object.keys(controls.tokens.tools).length,
       button: true,
       visible: true,
-      active: !paused,
-      toggle: true,
       onChange: () => {
         const current = game.settings.get(MODULE_ID, SETTINGS.PAUSED);
         api()?.setPaused(!current);
