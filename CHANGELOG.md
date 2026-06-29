@@ -2,6 +2,21 @@
 
 All notable changes to HAmbience will be documented here.
 
+## [1.8.5]
+
+### Fixed
+- Gitea release workflow: replaced hardcoded internal URLs with repository variables
+- Duplicate release conflict resolved by retagging
+
+## [1.8.4]
+
+### Fixed
+- Critical roll preset detection now works with MIDI QoL active (uses midi-qol.RollComplete hook)
+- Falls back to createChatMessage when MIDI QoL is not active
+- Blueprint sound input: removed separate media player field, media selector now returns player and content in one input
+- Blueprint sound action now correctly extracts entity_id and media_content_id from the media selector object
+
+
 ## [1.8.3]
 
 ### Added
