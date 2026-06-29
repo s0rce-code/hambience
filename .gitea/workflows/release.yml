@@ -28,11 +28,12 @@ jobs:
 
       - name: Create release and upload assets
         env:
-          GITEA_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITEA_TOKEN: ${{ secrets.GITEA_TOKEN }}
           VERSION: ${{ steps.version.outputs.VERSION }}
-          INTERNAL_URL: http://${{ secrets.INTERALURL }}
+          INTERALURL: ${{ secrets.INTERALURL }}
           REPO_URL: ${{ secrets.REPOURL }}
         run: |
+          INTERNAL_URL="http://${INTERALURL}"
           MANIFEST_URL="${REPO_URL}/releases/download/${VERSION}/module.json"
 
           RELEASE=$(curl -s -X POST \
