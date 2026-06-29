@@ -42,15 +42,6 @@ variables:
   sound_content_type: "{{ crit_sound.media_content_type if crit_sound is mapping else 'music' }}"
 
 action:
-  # Snapshot current light state so we can restore it after the flash.
-  - variables:
-      light_states: >-
-        {% set ns = namespace(states=[]) %}
-        {% for entity_id in (expand(crit_lights) | map(attribute='entity_id') | list) %}
-          {% set s = states[entity_id] %}
-          {% set ns.states = ns.states + [{'entity_id': entity_id, 'state': s.state, 'attributes': s.attributes}] %}
-        {% endfor %}
-        {{ ns.states }}
   # Flash: turn on with crit color.
   - service: light.turn_on
     target: !input crit_lights
@@ -73,32 +64,12 @@ action:
                 media_content_type: "{{ sound_content_type }}"
                 metadata: {}
     default: []
-  # Hold the crit color for 2 seconds.
+  # Hold the crit color briefly.
   - delay:
       seconds: 2
-  # Restore each light to its prior state.
-  - repeat:
-      for_each: "{{ light_states }}"
-      sequence:
-        - choose:
-            - conditions:
-                - condition: template
-                  value_template: "{{ repeat.item.state == 'on' }}"
-              sequence:
-                - service: light.turn_on
-                  target:
-                    entity_id: "{{ repeat.item.entity_id }}"
-                  data:
-                    brightness: "{{ repeat.item.attributes.brightness | default(255) }}"
-                    color_temp: "{{ repeat.item.attributes.color_temp | default(omit) }}"
-                    rgb_color: "{{ repeat.item.attributes.rgb_color | default(omit) }}"
-                    transition: 1
-            - conditions:
-                - condition: template
-                  value_template: "{{ repeat.item.state == 'off' }}"
-              sequence:
-                - service: light.turn_off
-                  target:
-                    entity_id: "{{ repeat.item.entity_id }}"
-                  data:
-                    transition: 1
+  # Turn the lights back off. Users can chain this into their own scene
+  # automation if they want to restore a specific state instead.
+  - service: light.turn_off
+    target: !input crit_lights
+    data:
+      transition: 1
