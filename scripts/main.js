@@ -342,12 +342,16 @@ Hooks.once("init", () => {
   Hooks.on("hambience.fire", (payload = {}) => {
     F2HA.fire(payload);
   });
+
+  // Register the GM toggle hook during init so it's ready before the canvas
+  // loads. getSceneControlButtons fires during canvas init which can happen
+  // before the ready hook, so registering here ensures we never miss it.
+  initIntegrationControls();
 });
 
 Hooks.once("ready", () => {
   F2HA.log("Ready.");
   F2HA.registerTriggers();
   initAmbience();
-  initIntegrationControls();
   initSessionSync();
 });
