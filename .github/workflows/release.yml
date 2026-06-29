@@ -1,0 +1,64 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF_NAME}" >> $GITHUB_OUTPUT
+
+      - name: Extract changelog for this version
+        id: changelog
+        run: |
+          VERSION=${{ steps.version.outputs.VERSION }}
+          VERSION_NUM=${VERSION#v}
+          # Extract the section between this version header and the next one
+          BODY=$(awk "/^## \[${VERSION_NUM}\]/{found=1; next} found && /^## \[/{exit} found{print}" CHANGELOG.md)
+          # Escape for GitHub Actions output
+          echo "BODY<<EOF_BODY" >> $GITHUB_OUTPUT
+          echo "$BODY" >> $GITHUB_OUTPUT
+          echo "EOF_BODY" >> $GITHUB_OUTPUT
+
+      - name: Update module.json
+        run: |
+          VERSION=${{ steps.version.outputs.VERSION }}
+          VERSION_NUM=${VERSION#v}
+          sed -i "s|\"version\": \"[^\"]*\"|\"version\": \"${VERSION_NUM}\"|g" module.json
+          sed -i "s|\"download\": \"[^\"]*\"|\"download\": \"https://github.com/s0rce-code/hambience/releases/download/${VERSION}/module.zip\"|g" module.json
+
+      - name: Package module.zip
+        run: zip -r module.zip . -x "*.git*" -x ".github/*" -x ".gitea/*" -x "*.DS_Store"
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.VERSION }}
+          name: HAmbience ${{ steps.version.outputs.VERSION }}
+          body: |
+            ${{ steps.changelog.outputs.BODY }}
+
+            ---
+
+            ## Install
+
+            Paste this URL into Foundry's module installer:
+            ```
+            https://github.com/s0rce-code/hambience/releases/latest/download/module.json
+            ```
+
+            If HAmbience adds something to your table, a coffee helps me keep building:
+            https://buymeacoffee.com/s0rcecode
+          files: |
+            module.json
+            module.zip
