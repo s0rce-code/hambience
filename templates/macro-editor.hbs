@@ -1,0 +1,54 @@
+<div class="f2ha-macro-editor-body">
+
+  <div class="form-group">
+    <label for="f2ha-me-name">Macro Name</label>
+    <input type="text" id="f2ha-me-name" name="name" placeholder="e.g. Battle Start" />
+  </div>
+
+  {{#if hybrid}}
+  <div class="f2ha-mode-tabs">
+    <button type="button" class="f2ha-tab {{#if isBuilder}}active{{/if}}" data-action="setBuildMode" data-mode="builder">
+      <i class="fas fa-list-check"></i> Build from HA
+    </button>
+    <button type="button" class="f2ha-tab {{#unless isBuilder}}active{{/unless}}" data-action="setBuildMode" data-mode="raw">
+      <i class="fas fa-code"></i> Raw JSON
+    </button>
+  </div>
+  {{/if}}
+
+  {{#if isBuilder}}
+    {{#if hasEntities}}
+    <div class="form-group">
+      <label for="f2ha-me-entity">Target Entity</label>
+      <select id="f2ha-me-entity" name="builderEntity">
+        {{#each entities}}
+        <option value="{{this.entity_id}}">{{this.friendly_name}} - {{this.entity_id}}</option>
+        {{/each}}
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="f2ha-me-service">Action</label>
+      <select id="f2ha-me-service" name="builderService"></select>
+    </div>
+    {{else}}
+    <p class="f2ha-warn">No entities loaded. Check connection settings, then refresh.</p>
+    {{/if}}
+    <div class="form-group">
+      <button type="button" class="f2ha-btn" data-action="refreshEntities"><i class="fas fa-rotate"></i> Refresh Entities</button>
+    </div>
+  {{else}}
+    <div class="form-group">
+      <label for="f2ha-me-payload">Payload (JSON)</label>
+      <textarea id="f2ha-me-payload" name="payload" rows="6">{
+  "service": "script.turn_on",
+  "entity": "script.your_script"
+}</textarea>
+      <button type="button" class="f2ha-btn" data-action="validatePayload"><i class="fas fa-check-circle"></i> Validate &amp; Format</button>
+      <p class="hint">Best practice: call an HA script or automation.</p>
+    </div>
+  {{/if}}
+
+  <footer class="f2ha-footer">
+    <button type="submit"><i class="fas fa-save"></i> Create Macro</button>
+  </footer>
+</div>

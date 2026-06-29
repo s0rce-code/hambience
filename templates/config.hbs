@@ -1,0 +1,126 @@
+<div class="f2ha-config-body">
+
+  <div class="form-group">
+    <label for="f2ha-mode">Connection Mode</label>
+    <select id="f2ha-mode" name="connectionMode">
+      {{#each modes}}
+      <option value="{{this.value}}" {{#if (eq this.value ../mode)}}selected{{/if}}>{{this.label}}</option>
+      {{/each}}
+    </select>
+    <p class="hint">Webhook-only never stores a token. Hybrid adds a read-only token used <em>only</em> to list your entities for the pickers - dispatch still goes through the webhook either way.</p>
+  </div>
+
+  <hr/>
+
+  <div class="form-group">
+    <label for="f2ha-webhook">Webhook URL</label>
+    <div class="form-fields">
+      <input type="text" id="f2ha-webhook" name="webhookUrl" value="{{webhookUrl}}"
+             placeholder="https://your-ha-host/api/webhook/your-id" />
+      <button type="button" class="f2ha-btn" data-action="testWebhook">
+        <i class="fas fa-paper-plane"></i> Test
+      </button>
+    </div>
+    <p class="hint">For externally hosted Foundry (e.g. OVH) or Nabu Casa, use your externally reachable HA webhook URL here.</p>
+    <button type="button" class="f2ha-btn" data-action="generateReceiver">
+      <i class="fas fa-wand-magic-sparkles"></i> Generate HA Receiver Automation
+    </button>
+    <p class="hint">First time setup: this creates the Home Assistant automation that receives HAmbience calls, with a unique private webhook id, and fills in your Webhook URL. Import the downloaded YAML into Home Assistant (Settings, Automations &amp; Scenes, create automation, Edit in YAML, paste).</p>
+  </div>
+
+  {{#if isHybrid}}
+  <hr/>
+  <h3><i class="fas fa-house-signal"></i> Home Assistant (entity discovery)</h3>
+
+  <div class="form-group">
+    <label for="f2ha-haurl">Home Assistant URL</label>
+    <input type="text" id="f2ha-haurl" name="haUrl" value="{{haUrl}}"
+           placeholder="http://192.168.1.5:8123 or https://your.nabu.casa" />
+  </div>
+
+  <div class="form-group">
+    <label for="f2ha-hatoken">Long-Lived Access Token</label>
+    <div class="form-fields">
+      <input type="password" id="f2ha-hatoken" name="haToken" value="{{haToken}}"
+             placeholder="Profile → Security → Long-Lived Access Tokens" />
+      <button type="button" class="f2ha-btn" data-action="testHa">
+        <i class="fas fa-plug"></i> Test
+      </button>
+    </div>
+    <p class="hint">Read-only use. If the test fails with a network error, it's CORS. Add this exact block to your Home Assistant <code>configuration.yaml</code>, then restart HA:</p>
+    <pre class="hambience-yaml"><code>{{corsYaml}}</code></pre>
+    <button type="button" class="f2ha-btn" data-action="copyOrigin">
+      <i class="fas fa-copy"></i> Copy CORS YAML
+    </button>
+    <p class="hint">If you already have an <code>http:</code> block, add just the <code>cors_allowed_origins</code> entry under it rather than duplicating <code>http:</code>.</p>
+  </div>
+
+  <div class="form-group">
+    <label for="f2ha-filter">Entity Filter</label>
+    <select id="f2ha-filter" name="entityFilterMode">
+      {{#each filterModes}}
+      <option value="{{this.value}}" {{#if (eq this.value ../filterMode)}}selected{{/if}}>{{this.label}}</option>
+      {{/each}}
+    </select>
+  </div>
+
+  {{#if isLabel}}
+  <div class="form-group">
+    <label for="f2ha-label">Label</label>
+    <div class="form-fields">
+      <input type="text" id="f2ha-label" name="entityLabel" value="{{entityLabel}}" placeholder="hambience" />
+      <button type="button" class="f2ha-btn" data-action="loadLabels">
+        <i class="fas fa-tags"></i> Load Labels
+      </button>
+    </div>
+    <div class="form-fields">
+      <select class="hambience-label-pick">
+        <option value="">Suggestions{{#if labelsLoaded}} (incl. your HA labels){{/if}}...</option>
+        {{#each labels}}
+        <option value="{{this.name}}" {{#if this.selected}}selected{{/if}}>{{this.name}}{{#if this.recommended}} (recommended){{/if}}</option>
+        {{/each}}
+      </select>
+    </div>
+    <p class="hint">In Home Assistant, assign a label such as <code>hambience</code> or <code>foundry</code> to any script, automation, or scene you want HAmbience to list, then enter that label here. Only labeled entities appear in the pickers. Click <strong>Load Labels</strong> to pull your existing HA labels into the Suggestions dropdown.</p>
+  </div>
+  {{/if}}
+
+  {{#if isDomain}}
+  <div class="form-group">
+    <label>Entity Types</label>
+    <select name="entityDomains" multiple size="6">
+      {{#each domainOptions}}
+      <option value="{{this.value}}" {{#if this.selected}}selected{{/if}}>{{this.label}}</option>
+      {{/each}}
+    </select>
+    <p class="hint">Only entities in these domains will be listed.</p>
+  </div>
+  {{/if}}
+
+  {{#if isAll}}
+  <p class="f2ha-warn"><i class="fas fa-triangle-exclamation"></i> All entities will be pulled in. On a large Home Assistant instance this list can be huge and slow to load. Labels are strongly recommended instead.</p>
+  {{/if}}
+
+  <div class="form-group">
+    <button type="button" class="f2ha-btn" data-action="refreshEntities">
+      <i class="fas fa-rotate"></i> Refresh Entity Cache
+    </button>
+  </div>
+  {{/if}}
+
+  <hr/>
+  <h3><i class="fas fa-satellite-dish"></i> Game Status Sync</h3>
+  <div class="form-group">
+    <label class="hambience-check">
+      <input type="checkbox" name="sessionSyncEnabled" {{#if sessionSyncEnabled}}checked{{/if}} />
+      Toggle a Home Assistant entity when your session starts and ends
+    </label>
+    <label for="f2ha-session-entity">Game Active entity</label>
+    <input type="text" id="f2ha-session-entity" name="sessionEntity" value="{{sessionEntity}}" placeholder="input_boolean.game_active" />
+    <p class="hint">Turns the entity on when you load the world and off when you close it. An <code>input_boolean</code> works well. Session-end is best-effort (sent as the tab closes).</p>
+  </div>
+
+  <footer class="f2ha-footer">
+    <button type="submit"><i class="fas fa-save"></i> Save</button>
+  </footer>
+</div>

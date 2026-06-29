@@ -1,0 +1,50 @@
+<div class="f2ha-triggers-body">
+
+  <div class="f2ha-triggers-header">
+    <p class="hint">Each trigger fires its payload to the webhook when its Foundry hook fires. Dispatch is GM-only.</p>
+    <button type="button" class="f2ha-btn" data-action="addTrigger">
+      <i class="fas fa-plus"></i> Add Trigger
+    </button>
+  </div>
+
+  {{#if hasTriggers}}
+  <table class="f2ha-triggers-table">
+    <thead>
+      <tr>
+        <th class="col-enabled"></th>
+        <th class="col-name">Name</th>
+        <th class="col-hook">Hook</th>
+        <th class="col-payload">Payload</th>
+        <th class="col-debounce" data-tooltip="Debounce (ms)"><i class="fas fa-stopwatch"></i></th>
+        <th class="col-actions"></th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each triggers}}
+      <tr class="{{#unless this.enabled}}f2ha-disabled{{/unless}}">
+        <td class="col-enabled">
+          <button type="button" class="f2ha-iconbtn" data-action="toggleTrigger" data-index="{{this.index}}"
+                  data-tooltip="{{#if this.enabled}}Enabled click to disable{{else}}Disabled click to enable{{/if}}">
+            <i class="fas {{#if this.enabled}}fa-toggle-on{{else}}fa-toggle-off{{/if}}"></i>
+          </button>
+        </td>
+        <td class="col-name">{{this.name}}</td>
+        <td class="col-hook"><code>{{this.hook}}</code></td>
+        <td class="col-payload"><code class="f2ha-payload-preview">{{this.payloadPreview}}</code></td>
+        <td class="col-debounce">{{#if this.debounce}}{{this.debounce}}{{else}}-{{/if}}</td>
+        <td class="col-actions">
+          <button type="button" class="f2ha-iconbtn" data-action="editTrigger" data-index="{{this.index}}" data-tooltip="Edit">
+            <i class="fas fa-edit"></i>
+          </button>
+          <button type="button" class="f2ha-iconbtn f2ha-danger" data-action="deleteTrigger" data-index="{{this.index}}" data-tooltip="Delete">
+            <i class="fas fa-trash"></i>
+          </button>
+        </td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+  {{else}}
+  <p class="f2ha-empty">No triggers yet. Click <strong>Add Trigger</strong> to create one.</p>
+  {{/if}}
+</div>

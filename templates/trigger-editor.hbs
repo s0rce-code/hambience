@@ -1,0 +1,128 @@
+<div class="f2ha-trigger-editor-body">
+
+  <div class="form-group">
+    <label for="f2ha-te-name">Name <span class="f2ha-optional">(optional)</span></label>
+    <input type="text" id="f2ha-te-name" name="name" value="{{name}}" placeholder="e.g. Combat lights on" />
+  </div>
+
+  <div class="form-group">
+    <label for="f2ha-te-preset">Preset <span class="f2ha-optional">(optional)</span></label>
+    <select id="f2ha-te-preset" name="preset" data-action="setPreset">
+      <option value="">None (custom hook)</option>
+      {{#each presets}}
+      <option value="{{this.id}}" {{#if this.selected}}selected{{/if}}>{{this.name}}</option>
+      {{/each}}
+    </select>
+    {{#if hasPreset}}
+    <p class="hint">{{presetDescription}}</p>
+    {{#each presetOptions}}
+    <label class="hambience-check">
+      <input type="checkbox" name="presetConfig.{{this.key}}" {{#if this.checked}}checked{{/if}} />
+      {{this.label}}
+    </label>
+    {{/each}}
+    {{#if presetBlueprint}}
+    <div class="hambience-preset-blueprint">
+      <p class="hint"><i class="fas fa-puzzle-piece"></i> Companion blueprint <code>{{presetBlueprint}}</code> pairs a light flash with an optional sound. Get it, import it into Home Assistant, then point the entity below at the automation it creates.</p>
+      <div class="hambience-row">
+        <button type="button" class="hambience-btn" data-action="copyPresetBlueprintUrl"><i class="fas fa-link"></i> Copy Blueprint URL</button>
+        <button type="button" class="hambience-btn" data-action="copyPresetBlueprintYaml"><i class="fas fa-copy"></i> Copy YAML</button>
+        <button type="button" class="hambience-btn" data-action="downloadPresetBlueprint"><i class="fas fa-download"></i> Download</button>
+      </div>
+    </div>
+    {{/if}}
+    {{/if}}
+  </div>
+
+  {{#unless hasPreset}}
+  <div class="form-group">
+    <label for="f2ha-te-hookpick">Hook</label>
+    <select id="f2ha-te-hookpick" class="f2ha-hook-pick">
+      <option value="">Common hooks</option>
+      {{#each hooks}}
+      <option value="{{this.id}}" {{#if (eq this.id ../hook)}}selected{{/if}}>{{this.label}} ({{this.id}})</option>
+      {{/each}}
+    </select>
+    <input type="text" id="f2ha-te-hook" name="hook" value="{{hook}}" class="f2ha-hook-input"
+           placeholder="Hook name (e.g. combatStart)" />
+    <p class="hint">Pick from the list to fill the box, or type any custom hook. The box is what gets saved.</p>
+  </div>
+  {{/unless}}
+
+  <hr/>
+
+  <p class="hint">{{#if hasPreset}}This preset fires the entity below when its condition is met. Point it at the companion blueprint's automation, or any script/scene you like.{{else}}Choose what to send to Home Assistant when this trigger fires.{{/if}}</p>
+
+  {{#if hybrid}}
+  <div class="f2ha-mode-tabs">
+    <button type="button" class="f2ha-tab {{#if isBuilder}}active{{/if}}" data-action="setBuildMode" data-mode="builder">
+      <i class="fas fa-list-check"></i> Build from HA
+    </button>
+    <button type="button" class="f2ha-tab {{#unless isBuilder}}active{{/unless}}" data-action="setBuildMode" data-mode="raw">
+      <i class="fas fa-code"></i> Raw JSON
+    </button>
+  </div>
+  {{/if}}
+
+  {{#if isBuilder}}
+    {{#if hasEntities}}
+    <div class="form-group">
+      <label for="f2ha-te-entity">Target Entity</label>
+      <select id="f2ha-te-entity" name="builderEntity">
+        {{#each entities}}
+        <option value="{{this.entity_id}}" {{#if this.selected}}selected{{/if}}>{{this.friendly_name}} - {{this.entity_id}}</option>
+        {{/each}}
+      </select>
+      <p class="hint f2ha-target-guidance">Tip: target an HA script or automation rather than a device directly, so the logic lives in HA.</p>
+    </div>
+    <div class="form-group">
+      <label for="f2ha-te-service">Action</label>
+      <select id="f2ha-te-service" name="builderService">
+        {{#each services}}
+        <option value="{{this.value}}" {{#if this.selected}}selected{{/if}}>{{this.value}}</option>
+        {{/each}}
+      </select>
+      <p class="hint">Suggestions are based on the entity's domain.</p>
+    </div>
+    {{else}}
+    <p class="f2ha-warn">No entities loaded. Check your connection settings, then refresh.</p>
+    {{/if}}
+    <div class="form-group">
+      <button type="button" class="f2ha-btn" data-action="refreshEntities"><i class="fas fa-rotate"></i> Refresh Entities</button>
+    </div>
+  {{else}}
+    <div class="form-group">
+      <label for="f2ha-te-payload">Payload (JSON)</label>
+      <textarea id="f2ha-te-payload" name="payload" rows="6">{{payload}}</textarea>
+      <button type="button" class="f2ha-btn" data-action="validatePayload"><i class="fas fa-check-circle"></i> Validate &amp; Format</button>
+      <p class="hint">Home Assistant branches on this. Recommended shape: <code>{"service": "...", "entity": "..."}</code>. This module is best used to call HA scripts &amp; automations - it complements HA, it doesn't replace it.</p>
+    </div>
+  {{/if}}
+
+  <hr/>
+
+  <div class="form-group">
+    <label for="f2ha-te-debounce">Debounce (ms) <span class="f2ha-optional">(optional)</span></label>
+    <input type="number" id="f2ha-te-debounce" name="debounce" value="{{debounce}}" min="0" step="50" />
+    <p class="hint">Collapses rapid-fire hooks (updateActor, updateToken) into one call. 0 = off.</p>
+  </div>
+
+  <div class="form-group">
+    <label for="f2ha-te-macro">Also Run Macro <span class="f2ha-optional">(optional)</span></label>
+    <div class="form-fields">
+      <select id="f2ha-te-macro" name="macroId">
+        <option value="">None</option>
+        {{#each macros}}
+        <option value="{{this.id}}" {{#if (eq this.id ../macroId)}}selected{{/if}}>{{this.name}}</option>
+        {{/each}}
+      </select>
+      <button type="button" class="f2ha-btn" data-action="createMacro" data-tooltip="Generate a macro from this payload">
+        <i class="fas fa-magic"></i> Create
+      </button>
+    </div>
+  </div>
+
+  <footer class="f2ha-footer">
+    <button type="submit"><i class="fas fa-save"></i> {{#if isEdit}}Update{{else}}Add{{/if}} Trigger</button>
+  </footer>
+</div>

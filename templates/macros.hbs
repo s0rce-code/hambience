@@ -1,0 +1,37 @@
+<div class="f2ha-macros-body">
+
+  <div class="f2ha-triggers-header">
+    <p class="hint">Standalone macros that fire Home Assistant from a hotbar button - no trigger or dashboard needed.</p>
+    <button type="button" class="f2ha-btn" data-action="newMacro">
+      <i class="fas fa-plus"></i> New Macro
+    </button>
+  </div>
+
+  {{#if hasMacros}}
+  <table class="f2ha-triggers-table">
+    <thead>
+      <tr><th class="col-name">Macro</th><th class="col-actions"></th></tr>
+    </thead>
+    <tbody>
+      {{#each macros}}
+      <tr>
+        <td class="col-name">{{this.name}}</td>
+        <td class="col-actions">
+          <button type="button" class="f2ha-iconbtn" data-action="toHotbar" data-id="{{this.id}}" data-tooltip="Add to hotbar">
+            <i class="fas fa-bars-staggered"></i>
+          </button>
+          <button type="button" class="f2ha-iconbtn" data-action="openMacro" data-id="{{this.id}}" data-tooltip="Open macro">
+            <i class="fas fa-edit"></i>
+          </button>
+          <button type="button" class="f2ha-iconbtn f2ha-danger" data-action="deleteMacro" data-id="{{this.id}}" data-tooltip="Delete">
+            <i class="fas fa-trash"></i>
+          </button>
+        </td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+  {{else}}
+  <p class="f2ha-empty">No HAmbience macros yet. Click <strong>New Macro</strong> to create one.</p>
+  {{/if}}
+</div>
