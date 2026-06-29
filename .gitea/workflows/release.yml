@@ -1,0 +1,34 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF_NAME}" >> $GITHUB_OUTPUT
+
+      - name: Update download URL in module.json
+        run: |
+          VERSION=${{ steps.version.outputs.VERSION }}
+          sed -i "s|releases/download/v[^/]*/module.zip|releases/download/${VERSION}/module.zip|g" module.json
+
+      - name: Package module.zip
+        run: zip -r module.zip . -x "*.git*" -x ".gitea/*" -x "*.DS_Store"
+
+      - name: Create release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.version.outputs.VERSION }}
+          release_name: HAmbience ${{ steps.version.outputs.VERSION }}
+          draft: false
+          prerelease: false
