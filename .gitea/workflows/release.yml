@@ -23,10 +23,9 @@ jobs:
       - name: Update download URL in module.json
         run: |
           VERSION=${{ steps.version.outputs.VERSION }}
-          # Strip the 'v' prefix for the version field
           VERSION_NUM=${VERSION#v}
-          sed -i "s|releases/download/v[^/]*/module.zip|releases/download/${VERSION}/module.zip|g" module.json
           sed -i "s|\"version\": \"[^\"]*\"|\"version\": \"${VERSION_NUM}\"|g" module.json
+          sed -i "s|\"download\": \"[^\"]*\"|\"download\": \"https://git.msmanor.xyz/rufio/HAmbience/releases/download/${VERSION}/module.zip\"|g" module.json
 
       - name: Package module.zip
         run: zip -r module.zip . -x "*.git*" -x ".gitea/*" -x "*.DS_Store"
