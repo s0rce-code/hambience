@@ -42,13 +42,23 @@ variables:
   sound_content_type: "{{ crit_sound.media_content_type if crit_sound is mapping else 'music' }}"
 
 action:
-  # Slow, self-restoring flash so lights return to their prior state on their own.
+  # Snapshot current light state so we can restore it after the flash.
+  - variables:
+      light_states: >-
+        {% set ns = namespace(states=[]) %}
+        {% for entity_id in (expand(crit_lights) | map(attribute='entity_id') | list) %}
+          {% set s = states[entity_id] %}
+          {% set ns.states = ns.states + [{'entity_id': entity_id, 'state': s.state, 'attributes': s.attributes}] %}
+        {% endfor %}
+        {{ ns.states }}
+  # Flash: turn on with crit color.
   - service: light.turn_on
     target: !input crit_lights
     data:
       rgb_color: !input crit_color
-      flash: long
-  # Optional sound, only if the media selector was filled in.
+      brightness: 255
+      transition: 0.5
+  # Optional sound.
   - choose:
       - conditions:
           - condition: template
@@ -58,6 +68,37 @@ action:
             target:
               entity_id: "{{ sound_entity_id }}"
             data:
-              media_content_id: "{{ sound_content_id }}"
-              media_content_type: "{{ sound_content_type }}"
+              media:
+                media_content_id: "{{ sound_content_id }}"
+                media_content_type: "{{ sound_content_type }}"
+                metadata: {}
     default: []
+  # Hold the crit color for 2 seconds.
+  - delay:
+      seconds: 2
+  # Restore each light to its prior state.
+  - repeat:
+      for_each: "{{ light_states }}"
+      sequence:
+        - choose:
+            - conditions:
+                - condition: template
+                  value_template: "{{ repeat.item.state == 'on' }}"
+              sequence:
+                - service: light.turn_on
+                  target:
+                    entity_id: "{{ repeat.item.entity_id }}"
+                  data:
+                    brightness: "{{ repeat.item.attributes.brightness | default(255) }}"
+                    color_temp: "{{ repeat.item.attributes.color_temp | default(omit) }}"
+                    rgb_color: "{{ repeat.item.attributes.rgb_color | default(omit) }}"
+                    transition: 1
+            - conditions:
+                - condition: template
+                  value_template: "{{ repeat.item.state == 'off' }}"
+              sequence:
+                - service: light.turn_off
+                  target:
+                    entity_id: "{{ repeat.item.entity_id }}"
+                  data:
+                    transition: 1
