@@ -1,0 +1,152 @@
+.f2ha .form-group { margin-bottom: 0.5rem; }
+
+.f2ha-config-body,
+.f2ha-triggers-body,
+.f2ha-macros-body,
+.f2ha-trigger-editor-body,
+.f2ha-macro-editor-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.25rem;
+  /* Keep tall content inside the window frame instead of spilling past it. */
+  max-height: 72vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+/* Box-sizing + min-width:0 so flex children and inputs never exceed the frame. */
+.f2ha,
+.f2ha *,
+.f2ha *::before,
+.f2ha *::after { box-sizing: border-box; }
+.f2ha input,
+.f2ha select,
+.f2ha textarea,
+.f2ha pre { max-width: 100%; }
+.f2ha .form-fields > input,
+.f2ha .form-fields > select { min-width: 0; }
+
+.f2ha .form-fields { display: flex; gap: 0.5rem; align-items: center; min-width: 0; }
+.f2ha .form-fields input[type="text"],
+.f2ha .form-fields input[type="password"] { flex: 1; }
+
+.f2ha-btn,
+.f2ha-iconbtn {
+  width: auto;
+  flex: 0 0 auto;
+  white-space: nowrap;
+  line-height: 1.4;
+  padding: 0 0.5rem;
+}
+.f2ha-iconbtn { border: none; background: none; cursor: pointer; }
+.f2ha-danger:hover { color: #c93b3b; border-color: #c93b3b; }
+
+.f2ha-triggers-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.f2ha-triggers-header .hint { margin: 0; flex: 1; }
+
+.f2ha-triggers-table { width: 100%; border-collapse: collapse; font-size: var(--font-size-13, 0.85rem); }
+.f2ha-triggers-table th,
+.f2ha-triggers-table td {
+  padding: 0.25rem 0.4rem;
+  text-align: left;
+  border-bottom: 1px solid var(--color-border-light-tertiary, rgba(0,0,0,0.1));
+  vertical-align: middle;
+}
+.f2ha-triggers-table .col-enabled,
+.f2ha-triggers-table .col-debounce { text-align: center; width: 2.2rem; }
+.f2ha-triggers-table .col-actions { text-align: right; white-space: nowrap; width: 6rem; }
+.f2ha-triggers-table tr.f2ha-disabled td { opacity: 0.45; }
+
+.f2ha-payload-preview {
+  display: inline-block; max-width: 18rem;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+.f2ha-empty { font-style: italic; opacity: 0.8; padding: 0.5rem 0; }
+.f2ha-optional { font-weight: normal; opacity: 0.6; font-size: 0.85em; }
+
+.f2ha-warn {
+  background: rgba(201, 59, 59, 0.12);
+  border: 1px solid rgba(201, 59, 59, 0.4);
+  border-radius: 4px;
+  padding: 0.4rem 0.6rem;
+  margin: 0.25rem 0;
+}
+
+.f2ha-target-guidance.f2ha-good { color: #2e7d32; opacity: 1; }
+
+.f2ha-hook-pick { margin-bottom: 0.35rem; }
+
+.f2ha textarea {
+  width: 100%;
+  font-family: var(--font-mono, monospace);
+  font-size: var(--font-size-13, 0.85rem);
+}
+
+.f2ha-mode-tabs { display: flex; gap: 0.25rem; margin: 0.25rem 0; }
+.f2ha-tab {
+  flex: 1; cursor: pointer;
+  opacity: 0.6;
+  border-bottom: 2px solid transparent;
+}
+.f2ha-tab.active { opacity: 1; border-bottom-color: var(--color-text-hyperlink, #5e0000); }
+
+.f2ha-footer { margin-top: 0.5rem; display: flex; justify-content: flex-end; }
+.f2ha-footer button { width: auto; flex: 0 0 auto; }
+
+/* ============================ IRL Ambience tab ============================ */
+.hambience-tab-body { display: flex; flex-direction: column; gap: 0.5rem; padding: 0.25rem; }
+.hambience-intro { font-size: var(--font-size-13, 0.85rem); opacity: 0.9; }
+.hambience-muted { opacity: 0.7; font-style: italic; }
+.hambience-linked {
+  background: rgba(70, 130, 90, 0.12);
+  border: 1px solid rgba(70, 130, 90, 0.4);
+  border-radius: 4px;
+  padding: 0.4rem 0.6rem;
+  display: flex; flex-direction: column; gap: 0.35rem;
+}
+.hambience-linked p { margin: 0; }
+.hambience-row { display: flex; gap: 0.5rem; align-items: center; }
+.hambience-row .hambience-btn { flex: 0 0 auto; }
+.hambience-subtabs, .hambience-row { margin: 0.25rem 0; }
+.hambience-subtabs { display: flex; gap: 0.25rem; }
+.hambience-subtab {
+  flex: 1; cursor: pointer; opacity: 0.6;
+  border-bottom: 2px solid transparent;
+}
+.hambience-subtab.active { opacity: 1; border-bottom-color: var(--color-text-hyperlink, #5e0000); }
+.hambience-btn { width: auto; flex: 0 0 auto; white-space: nowrap; line-height: 1.4; padding: 0 0.5rem; cursor: pointer; }
+.hambience-primary { font-weight: bold; }
+.hambience-danger:hover { color: #c93b3b; border-color: #c93b3b; }
+.hambience-steps { font-size: var(--font-size-13, 0.85rem); padding-left: 1.2rem; margin: 0.4rem 0; }
+.hambience-steps li { margin-bottom: 0.25rem; }
+.hambience-tab .notes { font-size: var(--font-size-12, 0.8rem); opacity: 0.7; margin: 0.15rem 0; }
+.hambience-tab select, .hambience-tab input[type="text"] { width: 100%; }
+
+/* CORS YAML block */
+.hambience-yaml {
+  background: rgba(0,0,0,0.25);
+  border: 1px solid var(--color-border-light-tertiary, rgba(0,0,0,0.2));
+  border-radius: 4px;
+  padding: 0.5rem 0.7rem;
+  margin: 0.25rem 0;
+  overflow-x: auto;
+}
+.hambience-yaml code { font-family: var(--font-mono, monospace); font-size: var(--font-size-12, 0.8rem); white-space: pre; }
+.hambience-label-pick { width: 100%; }
+
+/* Checkboxes and support section */
+.hambience-check { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; }
+.hambience-check input[type="checkbox"] { flex: 0 0 auto; width: auto; }
+.hambience-support { text-align: center; }
+.hambience-support .hambience-primary { margin-top: 0.25rem; }
+
+/* Preset companion blueprint block in the trigger editor */
+.hambience-preset-blueprint { margin-top: 0.4rem; padding-top: 0.4rem; border-top: 1px dashed var(--color-border-light-tertiary, rgba(0,0,0,0.15)); }

@@ -1,0 +1,32 @@
+{
+  "id": "hambience",
+  "title": "HAmbience",
+  "description": "Bridge Foundry VTT scenes and game events to your physical game room through Home Assistant. GM-only dispatch, configurable triggers, optional read-only token for entity discovery, a point-and-click payload builder, a standalone macro library, and an IRL Ambience tab on every scene for linking or generating Home Assistant ambience.",
+  "version": "1.7.1",
+  "license": "GPL-3.0-or-later",
+  "authors": [
+    {
+      "name": "S0rce Code",
+      "url": "https://buymeacoffee.com/s0rcecode"
+    }
+  ],
+  "compatibility": {
+    "minimum": "13",
+    "verified": "14",
+    "maximum": "14"
+  },
+  "esmodules": [
+    "scripts/main.js"
+  ],
+  "styles": [
+    "styles/hambience.css"
+  ],
+  "socket": true,
+  "packs": [],
+  "relationships": {},
+  "url": "https://github.com/s0rce-code/hambience",
+  "manifest": "https://github.com/s0rce-code/hambience/releases/latest/download/module.json",
+  "download": "https://github.com/s0rce-code/hambience/releases/download/v1.7.1/module.zip",
+  "readme": "https://github.com/s0rce-code/hambience/blob/main/README.md",
+  "bugs": "https://github.com/s0rce-code/hambience/issues"
+}
