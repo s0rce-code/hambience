@@ -24,10 +24,14 @@
     {{#if presetBlueprint}}
     <div class="hambience-preset-blueprint">
       <p class="hint"><i class="fas fa-puzzle-piece"></i> Companion blueprint <code>{{presetBlueprint}}</code> pairs a light flash with an optional sound. Get it, import it into Home Assistant, then point the entity below at the automation it creates.</p>
+      {{#if suggestedEntity}}
+      <p class="hint"><i class="fas fa-circle-info"></i> If you keep the default name when importing, the entity will be <code>{{suggestedEntity}}</code>.</p>
+      {{/if}}
       <div class="hambience-row">
         <button type="button" class="hambience-btn" data-action="copyPresetBlueprintUrl"><i class="fas fa-link"></i> Copy Blueprint URL</button>
         <button type="button" class="hambience-btn" data-action="copyPresetBlueprintYaml"><i class="fas fa-copy"></i> Copy YAML</button>
         <button type="button" class="hambience-btn" data-action="downloadPresetBlueprint"><i class="fas fa-download"></i> Download</button>
+        <button type="button" class="hambience-btn" data-action="openHaBlueprints"><i class="fas fa-up-right-from-square"></i> Open in HA</button>
       </div>
     </div>
     {{/if}}

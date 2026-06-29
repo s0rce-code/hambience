@@ -183,11 +183,11 @@ export function generateCritBlueprintYaml(preset) {
           filter:
             - domain: media_player
     crit_sound:
-      name: Sound (media content id, optional)
-      description: A media_content_id (URL or media-source path). Leave empty for no sound.
+      name: Sound (optional)
+      description: A sound to play. Leave empty for no sound.
       default: ""
       selector:
-        text: {}
+        media: {}
 
 mode: restart
 

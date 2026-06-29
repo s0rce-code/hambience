@@ -60,7 +60,8 @@ export const TRIGGER_PRESETS = [
     match: (args, cfg) => matchNatural(args, 20, cfg),
     defaultConfig: { pcOnly: true },
     options: [{ key: "pcOnly", label: "Only player characters (ignore NPC rolls)", default: true }],
-    blueprint: "crit-nat20"
+    blueprint: "crit-nat20",
+    suggestedEntity: "automation.hambience_critical_hit_nat_20"
   },
   {
     id: "nat1",
@@ -71,7 +72,8 @@ export const TRIGGER_PRESETS = [
     match: (args, cfg) => matchNatural(args, 1, cfg),
     defaultConfig: { pcOnly: true },
     options: [{ key: "pcOnly", label: "Only player characters (ignore NPC rolls)", default: true }],
-    blueprint: "crit-nat1"
+    blueprint: "crit-nat1",
+    suggestedEntity: "automation.hambience_critical_miss_nat_1"
   }
 ];
 

@@ -115,7 +115,8 @@ export class F2HATriggerEditor extends HandlebarsApplicationMixin(ApplicationV2)
       setPreset: F2HATriggerEditor.#onSetPreset,
       copyPresetBlueprintUrl: F2HATriggerEditor.#onCopyPresetBlueprintUrl,
       copyPresetBlueprintYaml: F2HATriggerEditor.#onCopyPresetBlueprintYaml,
-      downloadPresetBlueprint: F2HATriggerEditor.#onDownloadPresetBlueprint
+      downloadPresetBlueprint: F2HATriggerEditor.#onDownloadPresetBlueprint,
+      openHaBlueprints: F2HATriggerEditor.#onOpenHaBlueprints
     }
   };
 
@@ -151,6 +152,12 @@ export class F2HATriggerEditor extends HandlebarsApplicationMixin(ApplicationV2)
       checked: presetConfig[o.key] ?? o.default ?? false
     }));
 
+    // Pre-fill the entity field when a preset is selected and the trigger is new.
+    const suggestedEntity = (activePreset?.suggestedEntity && !existing)
+      ? activePreset.suggestedEntity : "";
+
+    const haUrl = game.settings.get(MODULE_ID, SETTINGS.HA_URL) || "";
+
     return {
       isEdit: this.index !== null,
       hooks: getAllHooks(),
@@ -168,6 +175,8 @@ export class F2HATriggerEditor extends HandlebarsApplicationMixin(ApplicationV2)
       presetDescription: activePreset?.description ?? "",
       presetBlueprint: activePreset?.blueprint ?? "",
       presetOptions,
+      suggestedEntity,
+      haUrl,
 
       hybrid: this._hybrid,
       buildMode: this._buildMode,
@@ -229,6 +238,13 @@ export class F2HATriggerEditor extends HandlebarsApplicationMixin(ApplicationV2)
   static async #onSetPreset(event, target) {
     event.preventDefault();
     this._preset = target.value ?? "";
+    const preset = this._preset ? getPresetTrigger(this._preset) : null;
+    // Pre-fill the raw payload with the suggested entity when switching to a preset.
+    if (preset?.suggestedEntity) {
+      const payload = buildServicePayload("automation.trigger", preset.suggestedEntity);
+      const ta = this.element.querySelector('[name="payload"]');
+      if (ta) ta.value = payload;
+    }
     this.render();
   }
 
@@ -263,6 +279,15 @@ export class F2HATriggerEditor extends HandlebarsApplicationMixin(ApplicationV2)
     const bp = getCritBlueprint(this.#activeBlueprintId());
     if (!bp) return;
     downloadText(`hambience-${bp.id}.yaml`, generateCritBlueprintYaml(bp));
+  }
+
+  static async #onOpenHaBlueprints(event) {
+    event.preventDefault();
+    const base = (game.settings.get(MODULE_ID, SETTINGS.HA_URL) || "").replace(/\/+$/, "");
+    const url = base
+      ? `${base}/config/blueprint/dashboard`
+      : "https://my.home-assistant.io/redirect/blueprints/";
+    window.open(url, "_blank", "noopener");
   }
 
   static async #onRefreshEntities(event) {
