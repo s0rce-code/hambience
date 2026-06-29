@@ -27,28 +27,19 @@ function onGetSceneControls(controls) {
   if (!game.user?.isGM) return;
   const paused = !!game.settings.get(MODULE_ID, SETTINGS.PAUSED);
 
-  const tool = {
+  // v14: controls is a record, controls.tokens.tools is a record.
+  // Pattern from official v14 docs: controls.tokens.tools.myTool = { ... }
+  if (!controls?.tokens?.tools) return;
+
+  controls.tokens.tools["hambience-toggle"] = {
     name: "hambience-toggle",
-    title: paused ? `${MODULE_TITLE}: paused (click to resume)` : `${MODULE_TITLE}: active (click to pause)`,
-    icon: "fas fa-tower-broadcast",
-    toggle: true,
-    active: !paused,
+    title: paused ? "HAmbience: Paused (click to resume)" : "HAmbience: Active (click to pause)",
+    icon: "fa-solid fa-tower-broadcast",
+    order: Object.keys(controls.tokens.tools).length,
+    button: true,
     visible: true,
-    onChange: (_event, active) => api()?.setPaused(!active),
-    order: 99
+    onChange: () => api()?.setPaused(!game.settings.get(MODULE_ID, SETTINGS.PAUSED))
   };
-
-  // v14: controls is a record — controls.tokens.tools is also a record.
-  if (controls?.tokens?.tools && typeof controls.tokens.tools === "object" && !Array.isArray(controls.tokens.tools)) {
-    controls.tokens.tools[tool.name] = tool;
-    return;
-  }
-
-  // v13 fallback: controls is an array of control groups with tools arrays.
-  if (Array.isArray(controls)) {
-    const tokens = controls.find(c => c.name === "token") ?? controls[0];
-    if (Array.isArray(tokens?.tools)) tokens.tools.push(tool);
-  }
 }
 
 /* ====================================================================== */
